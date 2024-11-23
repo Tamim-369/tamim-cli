@@ -1,3 +1,5 @@
 node_modules
 .env
-builder.exe
+executable
+dist
+sparkpress.config.cjs

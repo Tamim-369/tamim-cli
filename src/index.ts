@@ -1,9 +1,14 @@
-const { program } = require('commander');
-const fs = require('fs');
-const axios = require('axios');
-const { automatePostman } = require('./createModulePostman');
-
-const generateRouteTemplate = (name, capitalizedModuleName) => `
+import { program } from "commander";
+import fs from "fs";
+import axios from "axios";
+import path from "path";
+import { automatePostman } from "./createModulePostman.js";
+type IField = {
+  name: string;
+  type: string;
+  isRequired: boolean;
+};
+const generateRouteTemplate = (name: string, capitalizedModuleName: string) => `
 import express from 'express';
 import { ${capitalizedModuleName}Controller } from './${name}.controller';
 import { USER_ROLES } from '../../../enums/user';
@@ -34,30 +39,34 @@ router.delete('/:id', auth(USER_ROLES.ADMIN), ${capitalizedModuleName}Controller
 export const ${capitalizedModuleName}Routes = router;
 `;
 // templates/model.template.js
-const generateModelTemplate = (name, capitalizedModuleName, fields) => {
-  const generateSchemaFields = fields => {
+const generateModelTemplate = (
+  name: string,
+  capitalizedModuleName: string,
+  fields: any
+) => {
+  const generateSchemaFields = (fields: IField[]) => {
     return fields
-      .map(field => {
-        if (field.type.includes('array') && !field.type.includes('ref')) {
+      .map((field: IField) => {
+        if (field.type.includes("array") && !field.type.includes("ref")) {
           return `${field.name}: {type: [${field.type
-            .split('=>')[1]
+            .split("=>")[1]
             .replace(
-              field.type.split('=>')[1][0],
-              field.type.split('=>')[1][0].toUpperCase()
+              field.type.split("=>")[1][0],
+              field.type.split("=>")[1][0].toUpperCase()
             )}], required: ${field.isRequired} }`;
         }
 
-        if (field.type.includes('ref')) {
-          if (field.type.includes('array=>ref')) {
+        if (field.type.includes("ref")) {
+          if (field.type.includes("array=>ref")) {
             return `${field.name}: {
               type: [{ type: Schema.Types.ObjectId, ref: '${
-                field.type.split('ref=>')[1]
+                field.type.split("ref=>")[1]
               }'},],
               required: ${field.isRequired}
             }`;
           }
           return `${field.name}: { type: Schema.Types.ObjectId, ref: '${
-            field.type.split('=>')[1]
+            field.type.split("=>")[1]
           }', required: ${field.isRequired} }`;
         }
 
@@ -66,7 +75,7 @@ const generateModelTemplate = (name, capitalizedModuleName, fields) => {
           field.type[0].toUpperCase()
         )}, required: ${field.isRequired} }`;
       })
-      .join(',\n  ');
+      .join(",\n  ");
   };
 
   return `
@@ -82,32 +91,36 @@ export const ${capitalizedModuleName} = model<I${capitalizedModuleName}, ${capit
 };
 
 // templates/interface.template.js
-const generateInterfaceTemplate = (name, capitalizedModuleName, fields) => {
-  const generateFieldTypes = fields => {
+const generateInterfaceTemplate = (
+  name: string,
+  capitalizedModuleName: string,
+  fields: IField[]
+) => {
+  const generateFieldTypes = (fields: IField[]) => {
     return fields
-      .map(field => {
-        fieldname = `${field.name}${field.isRequired ? '' : '?'}`;
-        if (field.type.includes('ref')) {
+      .map((field: IField) => {
+        const fieldname = `${field.name}${field.isRequired ? "" : "?"}`;
+        if (field.type.includes("ref")) {
           return `${fieldname}: ${
-            field.type.includes('array=>ref=>')
-              ? '[Types.ObjectId]'
-              : 'Types.ObjectId'
+            field.type.includes("array=>ref=>")
+              ? "[Types.ObjectId]"
+              : "Types.ObjectId"
           }`;
         }
-        if (field.type === 'date') return `${fieldname}: Date`;
-        if (field.type.includes('array')) {
-          const baseType = field.type.split('=>')[1];
+        if (field.type === "date") return `${fieldname}: Date`;
+        if (field.type.includes("array")) {
+          const baseType = field.type.split("=>")[1];
           return `${fieldname}: Array<${
-            baseType.includes('ref')
-              ? 'Types.ObjectId'
-              : baseType.includes('date')
-              ? 'Date'
+            baseType.includes("ref")
+              ? "Types.ObjectId"
+              : baseType.includes("date")
+              ? "Date"
               : baseType
           }>`;
         }
         return `${fieldname}: ${field.type}`;
       })
-      .join(';\n  ');
+      .join(";\n  ");
   };
 
   return `
@@ -122,17 +135,21 @@ export type ${capitalizedModuleName}Model = Model<I${capitalizedModuleName}>;
 };
 
 // templates/service.template.js
-const generateServiceTemplate = (name, capitalizedModuleName, fields) => {
-  const generateSearchFields = fields => {
+const generateServiceTemplate = (
+  name: string,
+  capitalizedModuleName: string,
+  fields: IField[]
+) => {
+  const generateSearchFields = (fields: IField[]) => {
     return fields
-      .map(field => {
-        if (!field.type.includes('string') && !field.type === 'string') {
+      .map((field) => {
+        if (!field.type.includes("string") && field.type !== "string") {
           return null;
         }
         return `{ ${field.name}: { $regex: search, $options: 'i' } }`;
       })
       .filter(Boolean)
-      .join(',\n        ');
+      .join(",\n        ");
   };
 
   return `
@@ -204,70 +221,74 @@ export const ${capitalizedModuleName}Service = {
 };
 
 // templates/validation.template.js
-const generateValidationTemplate = (name, capitalizedModuleName, fields) => {
-  const generateCreateValidationFields = fields => {
+const generateValidationTemplate = (
+  name: string,
+  capitalizedModuleName: string,
+  fields: IField[]
+) => {
+  const generateCreateValidationFields = (fields: IField[]) => {
     return fields
-      .map(field => {
-        if (field.type.includes('array=>ref=>')) {
+      .map((field) => {
+        if (field.type.includes("array=>ref=>")) {
           return `${field.name}: z.array(z.string({${
             field.isRequired === true
               ? `required_error:"${field.name} is required",`
-              : ''
+              : ""
           } invalid_type_error:"${
             field.name
           } array item should have type string" })${
-            field.isRequired === false ? `.optional()` : ''
+            field.isRequired === false ? `.optional()` : ""
           })`;
         }
-        if (field.type.includes('array')) {
-          return `${field.name}: z.array(z.${field.type.split('=>')[1]}({ ${
+        if (field.type.includes("array")) {
+          return `${field.name}: z.array(z.${field.type.split("=>")[1]}({ ${
             field.isRequired === true
               ? `required_error:"${field.name} is required",`
-              : ''
+              : ""
           } invalid_type_error:"${field.name} array item should have type ${
-            field.type.split('=>')[1]
-          }" })${field.isRequired === false ? `.optional()` : ''})`;
+            field.type.split("=>")[1]
+          }" })${field.isRequired === false ? `.optional()` : ""})`;
         }
         return `${field.name}: z.${
-          field.type.includes('ref') ? 'string' : field.type
+          field.type.includes("ref") ? "string" : field.type
         }({ ${
           field.isRequired &&
           `required_error:"${
-            field.name === 'Date' ? 'date' : field.name
+            field.name === "Date" ? "date" : field.name
           } is required",`
         } invalid_type_error:"${field.name} should be type ${
-          field.type.includes('ref') ? 'objectID or string' : field.type
+          field.type.includes("ref") ? "objectID or string" : field.type
         }" })`;
       })
-      .join(',\n      ');
+      .join(",\n      ");
   };
 
-  const generateUpdateValidationFields = fields => {
+  const generateUpdateValidationFields = (fields: IField[]) => {
     return fields
-      .map(field => {
-        if (field.type.includes('array=>ref=>')) {
+      .map((field) => {
+        if (field.type.includes("array=>ref=>")) {
           return `${field.name}: z.array(z.string({ invalid_type_error:"${field.name} array item should have type string" })).optional()`;
         }
-        if (field.type.includes('array')) {
+        if (field.type.includes("array")) {
           return `${field.name}: z.array(z.${
-            field.type.split('=>')[1]
+            field.type.split("=>")[1]
           }({ invalid_type_error:"${field.name} array item should have type ${
-            field.type.includes('array=>ref=>')
-              ? 'string'
-              : field.type.split('=>')[1]
+            field.type.includes("array=>ref=>")
+              ? "string"
+              : field.type.split("=>")[1]
           }" })).optional()`;
         }
-        if (field.type.includes('ref') && !field.type.includes('array')) {
+        if (field.type.includes("ref") && !field.type.includes("array")) {
           console.log(true);
           return `${field.name}: z.string({ invalid_type_error:"${field.name} should be type string" }).optional()`;
         }
         return `${field.name}: z.${
-          field.type.includes('ref') ? 'string' : field.type
+          field.type.includes("ref") ? "string" : field.type
         }({ invalid_type_error:"${field.name} should be type ${
-          field.type.includes('ref=>') ? 'objectID or string' : field.type
+          field.type.includes("ref=>") ? "objectID or string" : field.type
         }" }).optional()`;
       })
-      .join(',\n      ');
+      .join(",\n      ");
   };
 
   return `import { z } from 'zod';
@@ -291,7 +312,10 @@ export const ${capitalizedModuleName}Validation = {
 };
 
 // templates/controller.template.js
-const generateControllerTemplate = (name, capitalizedModuleName) => `
+const generateControllerTemplate = (
+  name: string,
+  capitalizedModuleName: string
+) => `
 import { Request, Response } from 'express';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
@@ -362,21 +386,21 @@ export const ${capitalizedModuleName}Controller = {
 `;
 
 // File generator configuration
-const fileGenerators = {
-  'route.ts': generateRouteTemplate,
-  'controller.ts': generateControllerTemplate,
-  'service.ts': generateServiceTemplate,
-  'validation.ts': generateValidationTemplate,
-  'interface.ts': generateInterfaceTemplate,
-  'model.ts': generateModelTemplate,
+const fileGenerators: any = {
+  "route.ts": generateRouteTemplate,
+  "controller.ts": generateControllerTemplate,
+  "service.ts": generateServiceTemplate,
+  "validation.ts": generateValidationTemplate,
+  "interface.ts": generateInterfaceTemplate,
+  "model.ts": generateModelTemplate,
 };
 
 const generateFileContent = (
-  fileType,
-  name,
-  capitalizedModuleName,
-  exportName,
-  fields
+  fileType: string,
+  name: string,
+  capitalizedModuleName: string,
+  exportName: string,
+  fields: IField[]
 ) => {
   const generator = fileGenerators[`${fileType}.ts`];
   if (!generator) {
@@ -386,12 +410,14 @@ const generateFileContent = (
 };
 process.stdin.isTTY = false;
 process.stdout.isTTY = false;
-const createModule = async (name, fields) => {
+const createModule = async (name: string, fields: any) => {
+  const configPath = path.resolve(process.cwd(), "sparkpress.config.cjs");
+  const { config } = require(configPath);
   try {
-    const parsedFields = fields.map(field => {
-      const [fieldName, fieldType] = field.includes('?:')
-        ? field.replace('?:', ':').split(':')
-        : field.split(':');
+    const parsedFields = fields.map((field: any) => {
+      const [fieldName, fieldType] = field?.includes("?:")
+        ? field.replace("?:", ":").split(":")
+        : field.split(":");
 
       if (!fieldName || !fieldType) {
         throw new Error(
@@ -401,54 +427,54 @@ const createModule = async (name, fields) => {
       return {
         name: fieldName,
         type: fieldType,
-        isRequired: field.toString().includes('?') ? false : true,
+        isRequired: field.toString().includes("?") ? false : true,
       };
     });
     const generateRandomString = () =>
       Math.random().toString(36).substring(2, 15); // Generates a random string
 
-    const postmanFields = parsedFields.reduce((acc, field) => {
+    const postmanFields = parsedFields.reduce((acc: any, field: any) => {
       let value;
 
       switch (field.type) {
-        case 'string':
-          field.name.includes('email')
-            ? (value = 'name@company.com')
-            : (value = 'a random string');
+        case "string":
+          field.name.includes("email")
+            ? (value = "name@company.com")
+            : (value = "a random string");
           break;
-        case 'array=>string':
-          value = ['a random string'];
+        case "array=>string":
+          value = ["a random string"];
           break;
-        case 'ref=>Product':
+        case "ref=>Product":
           value = `${generateRandomString()}`;
           break;
-        case 'array=>ref=>Product':
+        case "array=>ref=>Product":
           value = [`${generateRandomString()}`];
           break;
-        case 'date':
+        case "date":
           value = new Date().toISOString();
           break;
-        case 'number':
+        case "number":
           value = Math.floor(Math.random() * 100);
           break;
 
         default:
-          if (field.type.includes('array')) {
-            const baseType = field.type.split('=>')[1];
+          if (field.type.includes("array")) {
+            const baseType = field.type.split("=>")[1];
             console.log(baseType);
-            if (baseType.includes('ref')) {
+            if (baseType.includes("ref")) {
               value = [`${generateRandomString()}`];
               break;
-            } else if (baseType.toString() === 'string') {
-              value = ['a random string'];
+            } else if (baseType.toString() === "string") {
+              value = ["a random string"];
               break;
-            } else if (baseType.toString() === 'date') {
+            } else if (baseType.toString() === "date") {
               value = [new Date().toISOString()];
               break;
-            } else if (baseType.toString() === 'number') {
+            } else if (baseType.toString() === "number") {
               value = [Math.floor(Math.random() * 100)];
               break;
-            } else if (baseType.toString() === 'boolean') {
+            } else if (baseType.toString() === "boolean") {
               value = [true];
               break;
             }
@@ -463,48 +489,47 @@ const createModule = async (name, fields) => {
     const requestsArray = [
       {
         name: `Create ${name.replace(name[0], name[0].toUpperCase())}`,
-        method: 'POST',
+        method: "POST",
         url: `{{url}}/api/v1/${name.toLowerCase()}/create`,
-        token: '',
+        token: "",
         body: {
           ...postmanFields,
         },
       },
       {
         name: `Get One ${name.replace(name[0], name[0].toUpperCase())}`,
-        method: 'GET',
+        method: "GET",
         url: `{{url}}/api/v1/${name.toLowerCase()}/${generateRandomString()}`,
-        token: '',
+        token: "",
       },
       {
         name: `Get All ${name.replace(name[0], name[0].toUpperCase())}`,
-        method: 'GET',
+        method: "GET",
         url: `{{url}}/api/v1/${name.toLowerCase()}`,
       },
       {
         name: `Update ${name.replace(name[0], name[0].toUpperCase())}`,
-        method: 'PATCH',
+        method: "PATCH",
         url: `{{url}}/api/v1/${name.toLowerCase()}`,
-        token: '',
+        token: "",
         body: {
           ...postmanFields,
         },
       },
       {
         name: `Delete ${name.replace(name[0], name[0].toUpperCase())}`,
-        method: 'DELETE',
+        method: "DELETE",
         url: `{{url}}/api/v1/${name.toLowerCase()}/${generateRandomString()}`,
-        token: '',
+        token: "",
       },
     ];
     // console.log(JSON.stringify(requestsArray));
 
-    const moduleDir = `src/app/modules/${name}`;
+    const moduleDir = path.join(process.cwd(), "src", "app", "modules", name);
     fs.mkdirSync(moduleDir, { recursive: true });
-
-    const files = Object.keys(fileGenerators).map(type => ({
+    const files = Object.keys(fileGenerators).map((type) => ({
       path: `${moduleDir}/${name}.${type}`,
-      type: type.split('.')[0],
+      type: type.split(".")[0],
     }));
 
     files.forEach(({ path, type }) => {
@@ -520,7 +545,7 @@ const createModule = async (name, fields) => {
         exportName,
         parsedFields
       );
-      fs.writeFileSync(path, content.trim() + '\n');
+      fs.writeFileSync(path, content.trim() + "\n");
       console.log(`Created: ${path}`);
     });
 
@@ -529,7 +554,6 @@ const createModule = async (name, fields) => {
     );
     console.log(`\nAdding requests to postman.`);
 
-    const { config } = require(`${process.cwd()}/sparkpress.config.js`);
     await automatePostman(
       config.postman_api_key,
       config.postman_folder_name || name.toLowerCase(),
@@ -540,20 +564,20 @@ const createModule = async (name, fields) => {
     console.log(
       `\nSuccessfully added requests to postman and created required files`
     );
-  } catch (error) {
-    console.error('Error creating module:', error.message);
+  } catch (error: any) {
+    console.error("Error creating module:", error.message);
     process.exit(1);
   }
 };
 if (
-  process.argv.toString().includes('--help') ||
-  process.argv.toString().includes('-h')
+  process.argv.toString().includes("--help") ||
+  process.argv.toString().includes("-h")
 ) {
   program.outputHelp();
 }
 program
-  .command('create <name> <fields...>')
-  .description('Create a new module with specified fields')
+  .command("create <name> <fields...>")
+  .description("Create a new module with specified fields")
   .action(createModule);
 
 program.parse(process.argv);
