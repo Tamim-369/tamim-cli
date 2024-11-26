@@ -411,8 +411,10 @@ const generateFileContent = (
 process.stdin.isTTY = false;
 process.stdout.isTTY = false;
 const createModule = async (name: string, fields: any) => {
-  const configPath = path.resolve(process.cwd(), "sparkpress.config.cjs");
-  const { config } = require(configPath);
+  const isExistConfig = fs.existsSync(
+    path.resolve(process.cwd(), "sparkpress.config.cjs")
+  );
+
   try {
     const parsedFields = fields.map((field: any) => {
       const [fieldName, fieldType] = field?.includes("?:")
@@ -554,13 +556,17 @@ const createModule = async (name: string, fields: any) => {
     );
     console.log(`\nAdding requests to postman.`);
 
-    await automatePostman(
-      config.postman_api_key,
-      config.postman_folder_name || name.toLowerCase(),
-      config.postman_workspace_id,
-      config.postman_collection_name,
-      requestsArray
-    );
+    if (isExistConfig) {
+      const configPath = path.resolve(process.cwd(), "sparkpress.config.cjs");
+      const { config } = require(configPath);
+      await automatePostman(
+        config.postman_api_key,
+        config.postman_folder_name || name.toLowerCase(),
+        config.postman_workspace_id,
+        config.postman_collection_name,
+        requestsArray
+      );
+    }
     console.log(
       `\nSuccessfully added requests to postman and created required files`
     );
