@@ -85,21 +85,29 @@ export const automatePostman = async (
   // Map requests into the format expected by Postman
   const requests = requestsArray.map((request) => ({
     name: request.name,
+
     request: {
       method: request.method,
       url: request.url,
+      auth: {
+        type: "bearer",
+        bearer: [
+          {
+            key: "token",
+            value: `${request.token || ""}`,
+            type: "string",
+          },
+        ],
+      },
       header: [
         {
-          key: "Authorization",
-          value: `Bearer ${request.token || ""}`,
-        },
-        {
           key: "Content-Type",
-          value: "application/json", // Set Content-Type to application/json
+          value: "application/json",
         },
       ],
       body: {
         mode: "raw",
+        type: "JSON",
         raw: JSON.stringify(request.body, null, 4),
       },
     },

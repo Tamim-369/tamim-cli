@@ -571,6 +571,7 @@ const createModule = async (name: string, fields: any) => {
       `\nSuccessfully added requests to postman and created required files`
     );
   } catch (error: any) {
+    console.error("Error parsing fields:", error.message);
     console.error("Error creating module:", error.message);
     process.exit(1);
   }
