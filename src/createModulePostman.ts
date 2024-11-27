@@ -115,7 +115,7 @@ export const automatePostman = async (
 
   // Create a new folder with its own requests
   const newFolder = {
-    name: folderName,
+    name: folderName.toUpperCase(),
     item: requests, // Add only the requests for this folder
   };
 
