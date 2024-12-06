@@ -95,7 +95,7 @@ export const generateServiceTemplate = (
         ${
           isExistFileField &&
           `
-       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
+       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string') {
         await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
       }
       `
