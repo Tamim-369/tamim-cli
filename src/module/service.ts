@@ -75,11 +75,9 @@ export const generateServiceTemplate = (
     ${
       isExistFileField &&
       fileFieldData?.map((fileFieldData: any) => {
-        return `
-       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
-        await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
-      }
-      `;
+        return `if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
+          await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
+        }`;
       })
     }
     const result = await ${capitalizedModuleName}.findByIdAndUpdate(id, payload, { new: true });
