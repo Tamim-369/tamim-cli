@@ -2,7 +2,7 @@ import { program } from "commander";
 import fs from "fs";
 import axios from "axios";
 import path from "path";
-import { automatePostman } from "./createModulePostman.js";
+import { automatePostman } from "./postman/createModulePostman.js";
 import { IField } from "./types/field.type.js";
 import { generateRouteTemplate } from "./module/route.js";
 import { generateServiceTemplate } from "./module/service.js";
@@ -10,6 +10,7 @@ import { generateControllerTemplate } from "./module/controller.js";
 import { generateValidationTemplate } from "./module/validation.js";
 import { generateInterfaceTemplate } from "./module/interface.js";
 import { generateModelTemplate } from "./module/model.js";
+import { FileTypes } from "./enums/fileTypes.js";
 
 // File generator configuration
 const fileGenerators: any = {
@@ -32,7 +33,27 @@ const generateFileContent = (
   if (!generator) {
     return `// Define your ${fileType} logic here\nexport const ${exportName} = {};`;
   }
-  return generator(name, capitalizedModuleName, fields);
+  let fileFieldData = {
+    fieldName: "",
+    fieldType: "",
+  };
+  const isExistFileField = fields.some((field) =>
+    Object.values(FileTypes).some((fileType) => {
+      if (field.name.includes(fileType)) {
+        fileFieldData.fieldName = field.name;
+        fileFieldData.fieldType = fileType;
+        return true;
+      }
+      return false;
+    })
+  );
+  return generator(
+    name,
+    capitalizedModuleName,
+    fields,
+    isExistFileField,
+    fileFieldData || null
+  );
 };
 process.stdin.isTTY = false;
 process.stdout.isTTY = false;

@@ -4,7 +4,9 @@ import { IField } from "../types/field.type";
 export const generateServiceTemplate = (
   name: string,
   capitalizedModuleName: string,
-  fields: IField[]
+  fields: IField[],
+  isExistFileField: boolean,
+  fileFieldData: { fieldName: string; fieldType: string } | null
 ) => {
   const generateSearchFields = (fields: IField[]) => {
     return fields
@@ -23,8 +25,17 @@ export const generateServiceTemplate = (
   import ApiError from '../../../errors/ApiError';
   import { ${capitalizedModuleName} } from './${name}.model';
   import { I${capitalizedModuleName} } from './${name}.interface';
-  
+  ${
+    isExistFileField &&
+    `import { ${capitalizedModuleName}Validation } from './${name}.validation';
+    import unlinkFile from '../../../shared/unlinkFile';
+    `
+  }
   const create${capitalizedModuleName} = async (payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName}> => {
+    ${
+      isExistFileField &&
+      `await ${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+    }
     const result = await ${capitalizedModuleName}.create(payload);
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create ${name}!');
@@ -53,9 +64,21 @@ export const generateServiceTemplate = (
   };
   
   const update${capitalizedModuleName} = async (id: string, payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName} | null> => {
+      ${
+        isExistFileField &&
+        `await ${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+      }
     const isExist${capitalizedModuleName} = await get${capitalizedModuleName}ById(id);
     if (!isExist${capitalizedModuleName}) {
       throw new ApiError(StatusCodes.BAD_REQUEST, '${capitalizedModuleName} not found!');
+    }
+    ${
+      isExistFileField &&
+      `
+       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
+        await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
+      }
+      `
     }
     const result = await ${capitalizedModuleName}.findByIdAndUpdate(id, payload, { new: true });
     if (!result) {
@@ -69,6 +92,14 @@ export const generateServiceTemplate = (
     if (!isExist${capitalizedModuleName}) {
       throw new ApiError(StatusCodes.BAD_REQUEST, '${capitalizedModuleName} not found!');
     }
+        ${
+          isExistFileField &&
+          `
+       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
+        await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
+      }
+      `
+        }
     const result = await ${capitalizedModuleName}.findByIdAndDelete(id);
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete ${name}!');
