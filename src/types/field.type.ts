@@ -3,3 +3,4 @@ export type IField = {
   type: string;
   isRequired: boolean;
 };
+export type FileFieldData = { fieldName: string; fieldType: string };

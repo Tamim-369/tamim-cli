@@ -1,4 +1,4 @@
-import { IField } from "../types/field.type";
+import { FileFieldData, IField } from "../types/field.type";
 
 // templates/service.template.js
 export const generateServiceTemplate = (
@@ -6,7 +6,7 @@ export const generateServiceTemplate = (
   capitalizedModuleName: string,
   fields: IField[],
   isExistFileField: boolean,
-  fileFieldData: { fieldName: string; fieldType: string } | null
+  fileFieldData: FileFieldData[] | null
 ) => {
   const generateSearchFields = (fields: IField[]) => {
     return fields
@@ -74,11 +74,13 @@ export const generateServiceTemplate = (
     }
     ${
       isExistFileField &&
-      `
+      fileFieldData?.map((fileFieldData: any) => {
+        return `
        if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
         await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
       }
-      `
+      `;
+      })
     }
     const result = await ${capitalizedModuleName}.findByIdAndUpdate(id, payload, { new: true });
     if (!result) {
@@ -94,11 +96,13 @@ export const generateServiceTemplate = (
     }
         ${
           isExistFileField &&
-          `
-       if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string') {
-        await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
-      }
-      `
+          fileFieldData?.map((fileFieldData: any) => {
+            return `
+          if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string') {
+           await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
+         }
+         `;
+          })
         }
     const result = await ${capitalizedModuleName}.findByIdAndDelete(id);
     if (!result) {

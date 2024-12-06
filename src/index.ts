@@ -3,7 +3,7 @@ import fs from "fs";
 import axios from "axios";
 import path from "path";
 import { automatePostman } from "./postman/createModulePostman.js";
-import { IField } from "./types/field.type.js";
+import { FileFieldData, IField } from "./types/field.type.js";
 import { generateRouteTemplate } from "./module/route.js";
 import { generateServiceTemplate } from "./module/service.js";
 import { generateControllerTemplate } from "./module/controller.js";
@@ -11,6 +11,7 @@ import { generateValidationTemplate } from "./module/validation.js";
 import { generateInterfaceTemplate } from "./module/interface.js";
 import { generateModelTemplate } from "./module/model.js";
 import { FileTypes } from "./enums/fileTypes.js";
+import { request } from "./types/request.type.js";
 
 // File generator configuration
 const fileGenerators: any = {
@@ -33,15 +34,14 @@ const generateFileContent = (
   if (!generator) {
     return `// Define your ${fileType} logic here\nexport const ${exportName} = {};`;
   }
-  let fileFieldData = {
-    fieldName: "",
-    fieldType: "",
-  };
+  const fileFieldData: FileFieldData[] | null = [];
   const isExistFileField = fields.some((field) =>
     Object.values(FileTypes).some((fileType) => {
       if (field.name.includes(fileType)) {
-        fileFieldData.fieldName = field.name;
-        fileFieldData.fieldType = fileType;
+        fileFieldData.push({
+          fieldName: field.name,
+          fieldType: fileType,
+        });
         return true;
       }
       return false;
@@ -57,13 +57,27 @@ const generateFileContent = (
 };
 process.stdin.isTTY = false;
 process.stdout.isTTY = false;
-const createModule = async (name: string, fields: any) => {
+const createModule = async (name: string, fields: string[]) => {
+  if (!name) {
+    console.error("Error: Module name is required");
+    process.exit(1);
+  }
+
+  if (!Array.isArray(fields) || fields.length === 0) {
+    console.error("Error: At least one field must be specified");
+    process.exit(1);
+  }
+
   const isExistConfig = fs.existsSync(
     path.resolve(process.cwd(), "sparkpress.config.cjs")
   );
 
   try {
-    const parsedFields = fields.map((field: any) => {
+    const parsedFields = fields.map((field: string) => {
+      if (!field) {
+        throw new Error("Field definition cannot be empty");
+      }
+
       const [fieldName, fieldType] = field?.includes("?:")
         ? field.replace("?:", ":").split(":")
         : field.split(":");
@@ -74,11 +88,12 @@ const createModule = async (name: string, fields: any) => {
         );
       }
       return {
-        name: fieldName,
-        type: fieldType,
-        isRequired: field.toString().includes("?") ? false : true,
+        name: fieldName.trim(),
+        type: fieldType.trim(),
+        isRequired: !field.toString().includes("?"),
       };
     });
+
     const generateRandomString = () =>
       Math.random().toString(36).substring(2, 15); // Generates a random string
 
@@ -135,7 +150,7 @@ const createModule = async (name: string, fields: any) => {
       return acc;
     }, {});
 
-    const requestsArray = [
+    const requestsArray: request[] = [
       {
         name: `Create ${name.replace(name[0], name[0].toUpperCase())}`,
         method: "POST",
@@ -197,7 +212,16 @@ const createModule = async (name: string, fields: any) => {
       fs.writeFileSync(path, content.trim() + "\n");
       console.log(`Created: ${path}`);
     });
-
+    const fileFieldData: FileFieldData[] | null = [];
+    const isExistFileField = parsedFields.some((field: IField) =>
+      Object.values(FileTypes).some((fileType) => {
+        if (field.name.includes(fileType)) {
+          fileFieldData.push({ fieldName: field.name, fieldType: fileType });
+          return true;
+        }
+        return false;
+      })
+    );
     console.log(
       `\nSuccessfully created module '${name}' with all required files.`
     );
@@ -211,7 +235,9 @@ const createModule = async (name: string, fields: any) => {
         config.postman_folder_name || name.toLowerCase(),
         config.postman_workspace_id,
         config.postman_collection_name,
-        requestsArray
+        requestsArray,
+        isExistFileField as boolean,
+        fileFieldData as { fieldName: string; fieldType: string }[] | null
       );
     }
     console.log(

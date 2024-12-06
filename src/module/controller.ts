@@ -6,20 +6,22 @@ export const generateControllerTemplate = (
   capitalizedModuleName: string,
   fields: IField[],
   isExistFileField: boolean,
-  fileFieldData: { fieldName: string; fieldType: string } | null
+  fileFieldData: { fieldName: string; fieldType: string }[] | null
 ) => {
   const fileHandlingLogic = isExistFileField
-    ? `
+    ? fileFieldData?.map((fileFieldData: any) => {
+        return `
       if (req.files && '${
         fileFieldData?.fieldName
       }' in req.files && req.files.${fileFieldData?.fieldName}[0]) {
         req.body.${
           fileFieldData?.fieldName
         } = '/${fileFieldData?.fieldType.toLowerCase()}s/' + req.files.${
-        fileFieldData?.fieldName
-      }[0].filename;
+          fileFieldData?.fieldName
+        }[0].filename;
       }
-    `
+    `;
+      })
     : "";
 
   return `

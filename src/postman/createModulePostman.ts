@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import axios from "axios";
+import { request } from "../types/request.type";
+import { FileTypes } from "../enums/fileTypes";
 
 dotenv.config();
 
@@ -22,7 +24,9 @@ export const automatePostman = async (
   folderName: string,
   workspaceid: string,
   collectionName: string,
-  requestsArray: any
+  requestsArray: request[],
+  isFormData: boolean = false,
+  fileFieldData: { fieldName: string; fieldType: string }[] | null = null
 ) => {
   if (!Array.isArray(requestsArray)) {
     console.log("requestsArray must be an array");
@@ -83,60 +87,115 @@ export const automatePostman = async (
   const collection = await isExistCollectionByID(apiKey, collectionId);
 
   // Map requests into the format expected by Postman
-  const requests = requestsArray.map((request) => ({
-    name: request.name,
+  const requests = requestsArray.map((request: request) => {
+    // Prepare form data items if needed
+    const formDataItems =
+      isFormData && request.body
+        ? Object.entries(request.body).map(([key, value]) => {
+            const foundFileField = fileFieldData?.find(
+              (field) => field.fieldName === key
+            );
+            return {
+              key,
+              value: String(value),
+              type: foundFileField ? "file" : "text",
+              enabled: true,
+            };
+          })
+        : [];
 
-    request: {
-      method: request.method,
-      url: request.url,
-      auth: {
-        type: "bearer",
-        bearer: [
+    return {
+      name: request.name,
+      request: {
+        method: request.method,
+        header: [
           {
-            key: "token",
-            value: `${request.token || ""}`,
-            type: "string",
+            key: "Content-Type",
+            value: isFormData ? "multipart/form-data" : "application/json",
+            type: "text",
           },
         ],
-      },
-      header: [
-        {
-          key: "Content-Type",
-          value: "application/json",
+        body: isFormData
+          ? {
+              mode: "formdata",
+              formdata: formDataItems,
+            }
+          : request.body
+          ? {
+              mode: "raw",
+              raw: JSON.stringify(request.body, null, 2),
+              options: {
+                raw: {
+                  language: "json",
+                },
+              },
+            }
+          : undefined,
+        url: {
+          raw: request.url,
+          host: ["{{url}}"],
+          path: request.url.replace("{{url}}", "").split("/").filter(Boolean),
         },
-      ],
-      body: {
-        mode: "raw",
-        type: "JSON",
-        raw: JSON.stringify(request.body, null, 4),
+        auth: request.token
+          ? {
+              type: "bearer",
+              bearer: [
+                {
+                  key: "token",
+                  value: request.token,
+                  type: "string",
+                },
+              ],
+            }
+          : undefined,
       },
-    },
-  }));
+      response: [],
+    };
+  });
 
   // Create a new folder with its own requests
   const newFolder = {
     name: folderName.toUpperCase(),
-    item: requests, // Add only the requests for this folder
+    item: requests,
   };
 
-  // Add the new folder to the existing items without modifying others
-  collection.item.push(newFolder);
-
   // Update the collection with the modified items
-  const updateResponse = await axios.put(
-    `https://api.getpostman.com/collections/${collectionId}`,
-    {
+  try {
+    const updatePayload = {
       collection: {
-        ...collection,
-        item: collection.item, // Ensure you're updating with the correct item structure
+        info: {
+          ...collection.info,
+          schema:
+            "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        },
+        item: [...collection.item, newFolder],
       },
-    },
-    {
-      headers: { "X-Api-Key": apiKey },
-    }
-  );
+    };
 
-  return updateResponse.data;
+    console.log(
+      "Updating collection with payload:",
+      JSON.stringify(updatePayload, null, 2)
+    );
+
+    const updateResponse = await axios.put(
+      `https://api.getpostman.com/collections/${collectionId}`,
+      updatePayload,
+      {
+        headers: {
+          "X-Api-Key": apiKey,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return updateResponse.data;
+  } catch (error: any) {
+    console.error(
+      "Error updating collection:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
 // Example usage:
