@@ -15,8 +15,9 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { ${capitalizedModuleName}Validation } from './${name}.validation';
 ${
-  isExistFileField &&
-  "import fileUploadHandler from '../../middlewares/fileUploadHandler';"
+  isExistFileField
+    ? "import fileUploadHandler from '../../middlewares/fileUploadHandler';"
+    : ""
 }
 const router = express.Router();
 const rolesOfAccess=[] // all the user role who you want to give access to create, update and delete route
