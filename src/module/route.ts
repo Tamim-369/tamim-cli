@@ -20,7 +20,7 @@ ${
     : ""
 }
 const router = express.Router();
-const rolesOfAccess: Array<String>=[] // all the user role who you want to give access to create, update and delete route
+const rolesOfAccess = [USER_ROLES.ADMIN] // all the user role who you want to give access to create, update and delete route
 router.post(
   '/create',
   auth(...rolesOfAccess),
