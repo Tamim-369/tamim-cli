@@ -26,15 +26,17 @@ export const generateServiceTemplate = (
   import { ${capitalizedModuleName} } from './${name}.model';
   import { I${capitalizedModuleName} } from './${name}.interface';
   ${
-    isExistFileField &&
-    `import { ${capitalizedModuleName}Validation } from './${name}.validation';
+    isExistFileField
+      ? `import { ${capitalizedModuleName}Validation } from './${name}.validation';
     import unlinkFile from '../../../shared/unlinkFile';
     `
+      : ""
   }
   const create${capitalizedModuleName} = async (payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName}> => {
     ${
-      isExistFileField &&
-      `await ${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+      isExistFileField
+        ? `await ${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+        : ""
     }
     const result = await ${capitalizedModuleName}.create(payload);
     if (!result) {
@@ -43,7 +45,7 @@ export const generateServiceTemplate = (
     return result;
   };
   
-  const getAll${capitalizedModuleName}s = async (queryFields): Promise<I${capitalizedModuleName}[]> => {
+  const getAll${capitalizedModuleName}s = async (queryFields: Record<string, any>): Promise<I${capitalizedModuleName}[]> => {
   const { search, page, limit } = queryFields;
     const query = search ? { $or: [${generateSearchFields(fields)}] } : {};
     let queryBuilder = ${capitalizedModuleName}.find(query);
