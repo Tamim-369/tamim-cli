@@ -19,11 +19,10 @@ ${
   "import fileUploadHandler from '../../middlewares/fileUploadHandler';"
 }
 const router = express.Router();
-
+const rolesOfAccess=[] // all the user role who you want to give access to create, update and delete route
 router.post(
   '/create',
-  // change the role according to your preferences
-  // auth(USER_ROLES.ADMIN),
+  auth(rolesOfAccess),
   ${
     isExistFileField
       ? "fileUploadHandler(),"
@@ -35,8 +34,7 @@ router.get('/', ${capitalizedModuleName}Controller.getAll${capitalizedModuleName
 router.get('/:id', ${capitalizedModuleName}Controller.get${capitalizedModuleName}ById);
 router.patch(
   '/:id',
-  // change the role according to your preferences
-  // auth(USER_ROLES.ADMIN),
+  auth(rolesOfAccess),
   ${
     isExistFileField
       ? "fileUploadHandler(),"
@@ -44,7 +42,7 @@ router.patch(
   }
   ${capitalizedModuleName}Controller.update${capitalizedModuleName}
 );
-router.delete('/:id', auth(USER_ROLES.ADMIN), ${capitalizedModuleName}Controller.delete${capitalizedModuleName});
+router.delete('/:id', auth(rolesOfAccess), ${capitalizedModuleName}Controller.delete${capitalizedModuleName});
 
 export const ${capitalizedModuleName}Routes = router;
 `;

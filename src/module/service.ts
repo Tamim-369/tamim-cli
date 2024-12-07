@@ -43,14 +43,18 @@ export const generateServiceTemplate = (
     return result;
   };
   
-  const getAll${capitalizedModuleName}s = async (search: string, page: number | null, limit: number | null): Promise<I${capitalizedModuleName}[]> => {
+  const getAll${capitalizedModuleName}s = async (queryFields): Promise<I${capitalizedModuleName}[]> => {
+  const { search, page, limit } = queryFields;
     const query = search ? { $or: [${generateSearchFields(fields)}] } : {};
     let queryBuilder = ${capitalizedModuleName}.find(query);
   
     if (page && limit) {
       queryBuilder = queryBuilder.skip((page - 1) * limit).limit(limit);
     }
-  
+    delete queryFields.search;
+    delete queryFields.page;
+    delete queryFields.limit;
+    queryBuilder.find(queryFields);
     return await queryBuilder;
   };
   

@@ -43,11 +43,9 @@ export const generateControllerTemplate = (
     });
 
     const getAll${capitalizedModuleName}s = catchAsync(async (req: Request, res: Response) => {
-      const search: any = req.query.search || '';
-      const page = req.query.page || null;
-      const limit = req.query.limit || null;
+      const query = req.query;
 
-      const result = await ${capitalizedModuleName}Service.getAll${capitalizedModuleName}s(search as string, page as number | null, limit as number | null);
+      const result = await ${capitalizedModuleName}Service.getAll${capitalizedModuleName}s(query);
       sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
