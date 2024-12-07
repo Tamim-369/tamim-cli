@@ -20,10 +20,10 @@ ${
     : ""
 }
 const router = express.Router();
-const rolesOfAccess=[] // all the user role who you want to give access to create, update and delete route
+const rolesOfAccess: Array<String>=[] // all the user role who you want to give access to create, update and delete route
 router.post(
   '/create',
-  auth(rolesOfAccess),
+  auth(...rolesOfAccess),
   ${
     isExistFileField
       ? "fileUploadHandler(),"
@@ -35,7 +35,7 @@ router.get('/', ${capitalizedModuleName}Controller.getAll${capitalizedModuleName
 router.get('/:id', ${capitalizedModuleName}Controller.get${capitalizedModuleName}ById);
 router.patch(
   '/:id',
-  auth(rolesOfAccess),
+  auth(...rolesOfAccess),
   ${
     isExistFileField
       ? "fileUploadHandler(),"
@@ -43,7 +43,7 @@ router.patch(
   }
   ${capitalizedModuleName}Controller.update${capitalizedModuleName}
 );
-router.delete('/:id', auth(rolesOfAccess), ${capitalizedModuleName}Controller.delete${capitalizedModuleName});
+router.delete('/:id', auth(...rolesOfAccess), ${capitalizedModuleName}Controller.delete${capitalizedModuleName});
 
 export const ${capitalizedModuleName}Routes = router;
 `;
