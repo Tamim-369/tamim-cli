@@ -35,18 +35,26 @@ const generateFileContent = (
     return `// Define your ${fileType} logic here\nexport const ${exportName} = {};`;
   }
   const fileFieldData: FileFieldData[] | null = [];
-  const isExistFileField = fields.some((field) =>
-    Object.values(FileTypes).some((fileType) => {
-      if (field.name.includes(fileType)) {
-        fileFieldData.push({
-          fieldName: field.name,
-          fieldType: fileType,
-        });
-        return true;
+  const processedFields = new Set<string>();
+
+  fields.forEach((field) => {
+    if (!processedFields.has(field.name)) {
+      for (const fileType of Object.values(FileTypes)) {
+        if (
+          field.name.toLowerCase().includes(fileType.toLowerCase()) &&
+          field.type === "string"
+        ) {
+          fileFieldData.push({
+            fieldName: field.name,
+            fieldType: fileType,
+          });
+          processedFields.add(field.name);
+          break; // Stop checking other file types once we find a match
+        }
       }
-      return false;
-    })
-  );
+    }
+  });
+  const isExistFileField = fileFieldData.length > 0;
   return generator(
     name,
     capitalizedModuleName,
@@ -213,15 +221,26 @@ const createModule = async (name: string, fields: string[]) => {
       console.log(`Created: ${path}`);
     });
     const fileFieldData: FileFieldData[] | null = [];
-    const isExistFileField = parsedFields.some((field: IField) =>
-      Object.values(FileTypes).some((fileType) => {
-        if (field.name.includes(fileType)) {
-          fileFieldData.push({ fieldName: field.name, fieldType: fileType });
-          return true;
+    const processedFields = new Set<string>();
+
+    parsedFields.forEach((field: IField) => {
+      if (!processedFields.has(field.name)) {
+        for (const fileType of Object.values(FileTypes)) {
+          if (
+            field.name.toLowerCase().includes(fileType.toLowerCase()) &&
+            field.type === "string"
+          ) {
+            fileFieldData.push({
+              fieldName: field.name,
+              fieldType: fileType,
+            });
+            processedFields.add(field.name);
+            break; // Stop checking other file types once we find a match
+          }
         }
-        return false;
-      })
-    );
+      }
+    });
+    const isExistFileField = fileFieldData.length > 0;
     console.log(
       `\nSuccessfully created module '${name}' with all required files.`
     );

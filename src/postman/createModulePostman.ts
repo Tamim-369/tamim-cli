@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import axios from "axios";
 import { request } from "../types/request.type";
 import { FileTypes } from "../enums/fileTypes";
+import { FileFieldData } from "../types/field.type";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ export const automatePostman = async (
   collectionName: string,
   requestsArray: request[],
   isFormData: boolean = false,
-  fileFieldData: { fieldName: string; fieldType: string }[] | null = null
+  fileFieldData: FileFieldData[] | null = null
 ) => {
   if (!Array.isArray(requestsArray)) {
     console.log("requestsArray must be an array");

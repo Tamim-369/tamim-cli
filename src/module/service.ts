@@ -71,20 +71,25 @@ export const generateServiceTemplate = (
   
   const update${capitalizedModuleName} = async (id: string, payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName} | null> => {
       ${
-        isExistFileField &&
-        `await ${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+        isExistFileField
+          ? `await ${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema.parseAsync(payload);`
+          : ""
       }
     const isExist${capitalizedModuleName} = await get${capitalizedModuleName}ById(id);
     if (!isExist${capitalizedModuleName}) {
       throw new ApiError(StatusCodes.BAD_REQUEST, '${capitalizedModuleName} not found!');
     }
     ${
-      isExistFileField &&
-      fileFieldData?.map((fileFieldData: any) => {
-        return `if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
+      isExistFileField
+        ? fileFieldData
+            ?.map((fileFieldData: any) => {
+              return `if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string' && typeof payload.${fileFieldData?.fieldName} === 'string') {
           await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
         }`;
-      })
+            })
+            .toString()
+            .replace(/,/g, "\n")
+        : ""
     }
     const result = await ${capitalizedModuleName}.findByIdAndUpdate(id, payload, { new: true });
     if (!result) {
@@ -99,14 +104,18 @@ export const generateServiceTemplate = (
       throw new ApiError(StatusCodes.BAD_REQUEST, '${capitalizedModuleName} not found!');
     }
         ${
-          isExistFileField &&
-          fileFieldData?.map((fileFieldData: any) => {
-            return `
+          isExistFileField
+            ? fileFieldData
+                ?.map((fileFieldData: any) => {
+                  return `
           if (typeof isExist${capitalizedModuleName}.${fileFieldData?.fieldName} === 'string') {
            await unlinkFile(isExist${capitalizedModuleName}.${fileFieldData?.fieldName});
          }
          `;
-          })
+                })
+                .toString()
+                .replace(/,/g, "\n")
+            : ""
         }
     const result = await ${capitalizedModuleName}.findByIdAndDelete(id);
     if (!result) {

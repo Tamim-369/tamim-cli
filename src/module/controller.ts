@@ -8,22 +8,24 @@ export const generateControllerTemplate = (
   isExistFileField: boolean,
   fileFieldData: { fieldName: string; fieldType: string }[] | null
 ) => {
-  const fileHandlingLogic = isExistFileField
-    ? fileFieldData?.map((fileFieldData: any) => {
-        return `
-      if (req.files && '${
-        fileFieldData?.fieldName
-      }' in req.files && req.files.${fileFieldData?.fieldName}[0]) {
+  const fileHandlingLogic =
+    isExistFileField && fileFieldData && fileFieldData.length > 0
+      ? fileFieldData
+          .map((fileField: { fieldName: string; fieldType: string }) => {
+            return `
+      if (req.files && '${fileField.fieldName}' in req.files && req.files.${
+              fileField.fieldName
+            }[0]) {
         req.body.${
-          fileFieldData?.fieldName
-        } = '/${fileFieldData?.fieldType.toLowerCase()}s/' + req.files.${
-          fileFieldData?.fieldName
-        }[0].filename;
+          fileField.fieldName
+        } = '/${fileField.fieldType.toLowerCase()}s/' + req.files.${
+              fileField.fieldName
+            }[0].filename;
       }
     `;
-      })
-    : "";
-
+          })
+          .join("\n")
+      : "";
   return `
     import { Request, Response } from 'express';
     import catchAsync from '../../../shared/catchAsync';
