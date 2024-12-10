@@ -2,6 +2,7 @@ import addControllerFile from "./files/controller";
 import fs from "fs";
 import path from "path";
 import addRouteFile from "./files/route";
+import addValidationFile from "./files/validation";
 
 export default function addFile(fileType: string, moduleName: string): void {
   let content = "";
@@ -11,6 +12,9 @@ export default function addFile(fileType: string, moduleName: string): void {
       break;
     case "route":
       content = addRouteFile(moduleName);
+      break;
+    case "validation":
+      content = addValidationFile(moduleName);
       break;
     default:
       const capitalizedModuleName =
