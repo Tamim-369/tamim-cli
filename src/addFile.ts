@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import addRouteFile from "./files/route";
 import addValidationFile from "./files/validation";
+import addServiceFile from "./files/service";
 
 export default function addFile(fileType: string, moduleName: string): void {
   let content = "";
@@ -15,6 +16,9 @@ export default function addFile(fileType: string, moduleName: string): void {
       break;
     case "validation":
       content = addValidationFile(moduleName);
+      break;
+    case "service":
+      content = addServiceFile(moduleName);
       break;
     default:
       const capitalizedModuleName =
