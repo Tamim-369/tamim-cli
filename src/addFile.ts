@@ -1,12 +1,16 @@
 import addControllerFile from "./files/controller";
 import fs from "fs";
 import path from "path";
+import addRouteFile from "./files/route";
 
 export default function addFile(fileType: string, moduleName: string): void {
   let content = "";
   switch (fileType) {
     case "controller":
       content = addControllerFile(moduleName);
+      break;
+    case "route":
+      content = addRouteFile(moduleName);
       break;
     default:
       const capitalizedModuleName =
