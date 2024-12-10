@@ -12,6 +12,7 @@ import { generateInterfaceTemplate } from "./module/interface.js";
 import { generateModelTemplate } from "./module/model.js";
 import { FileTypes } from "./enums/fileTypes.js";
 import { request } from "./types/request.type.js";
+import addFile from "./addFile.js";
 
 // File generator configuration
 const fileGenerators: any = {
@@ -278,5 +279,8 @@ program
   .command("create <name> <fields...>")
   .description("Create a new module with specified fields")
   .action(createModule);
-
+program
+  .command("addFile <name>")
+  .description("Add a new file to the module")
+  .action(addFile);
 program.parse(process.argv);
