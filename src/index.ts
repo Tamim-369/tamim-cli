@@ -280,7 +280,7 @@ program
   .description("Create a new module with specified fields")
   .action(createModule);
 program
-  .command("addFile <fileType> <moduleName>")
+  .command("addFile <moduleFiles...>")
   .description("Add a new file to the module")
   .action(addFile);
 program.parse(process.argv);
