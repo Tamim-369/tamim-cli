@@ -59,18 +59,17 @@ This will create:
 
 ### Add Files to Existing Module
 
-````bash
+```bash
 tamim addFile <moduleFiles...>
+```
 
 ```bash
 tamim addFile user:route
-````
-
 ```
+
 This will create:
 
 - user.route.ts
-```
 
 in the user folder
 
