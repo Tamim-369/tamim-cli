@@ -1,6 +1,6 @@
 {
   "name": "@tamim369/tamim-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool for generating module boilerplate code including routes, controllers, services, and more",
   "main": "dist/index.js",
   "author": {
@@ -8,7 +8,7 @@
     "email": "ashiqurrahmantamim369@gmail.com"
   },
   "bin": {
-    "tamim": "./dist/index.js"
+    "tamim": "dist/index.js"
   },
   "type": "commonjs",
   "license": "MIT",
