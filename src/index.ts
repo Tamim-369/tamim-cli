@@ -284,4 +284,5 @@ program
   .command("addFile <moduleFiles...>")
   .description("Add a new file to the module")
   .action(addFile);
+
 program.parse(process.argv);
