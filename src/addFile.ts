@@ -6,6 +6,7 @@ import addValidationFile from "./files/validation";
 import addServiceFile from "./files/service";
 import addInterfaceFile from "./files/interface";
 import addModelFile from "./files/model";
+import addConstantFile from "./files/constants";
 
 export default function addFile(moduleFiles: string): void {
   for (const file of moduleFiles) {
@@ -30,6 +31,9 @@ export default function addFile(moduleFiles: string): void {
         break;
       case "model":
         content = addModelFile(moduleName);
+        break;
+      case "constant":
+        content = addConstantFile(moduleName);
         break;
       default:
         const capitalizedModuleName =
