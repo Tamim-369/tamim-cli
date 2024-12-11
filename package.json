@@ -1,5 +1,5 @@
 {
-  "name": "tamim",
+  "name": "tamim-cli",
   "version": "1.0.0",
   "description": "A CLI tool for generating module boilerplate code including routes, controllers, services, and more",
   "main": "dist/index.js",
