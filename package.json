@@ -1,13 +1,32 @@
 {
-  "name": "builder",
+  "name": "@tamim369/tamim-cli",
   "version": "1.0.0",
+  "description": "A CLI tool for generating module boilerplate code including routes, controllers, services, and more",
   "main": "dist/index.js",
+  "author": {
+    "name": "Ashiqur Rahman Tamim",
+    "email": "ashiqurrahmantamim369@gmail.com"
+  },
+  "bin": {
+    "tamim": "./dist/index.js"
+  },
   "type": "commonjs",
   "license": "MIT",
   "scripts": {
     "build": "tsc && pkg . --targets node18-win-x64 --no-bytecode --output executable/builder.exe",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "cli",
+    "module-generator",
+    "boilerplate",
+    "typescript"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },
@@ -16,22 +35,11 @@
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "global": "^4.4.0",
-    "mongoose": "^8.8.2",
-    "pkg": "^5.8.1",
-    "typescript": "^5.7.2"
+    "mongoose": "^8.8.2"
   },
-  "pkg": {
-    "targets": [
-      "node18-win-x64"
-    ],
-    "assets": [
-      "dist/**/*",
-      "node_modules/**/*"
-    ],
-    "outputPath": "executable"
-  },
-  "bin": "./dist/index.js",
   "devDependencies": {
+    "pkg": "^5.8.1",
+    "typescript": "^5.7.2",
     "@types/node": "^22.9.3"
   }
 }

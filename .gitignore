@@ -3,3 +3,4 @@ node_modules
 executable
 dist
 sparkpress.config.cjs
+tamim.config.cjs

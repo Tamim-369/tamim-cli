@@ -78,7 +78,7 @@ const createModule = async (name: string, fields: string[]) => {
   }
 
   const isExistConfig = fs.existsSync(
-    path.resolve(process.cwd(), "sparkpress.config.cjs")
+    path.resolve(process.cwd(), "tamim.config.cjs")
   );
 
   try {
@@ -248,7 +248,7 @@ const createModule = async (name: string, fields: string[]) => {
     console.log(`\nAdding requests to postman.`);
 
     if (isExistConfig) {
-      const configPath = path.resolve(process.cwd(), "sparkpress.config.cjs");
+      const configPath = path.resolve(process.cwd(), "tamim.config.cjs");
       const { config } = require(configPath);
       await automatePostman(
         config.postman_api_key,
