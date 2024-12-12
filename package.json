@@ -13,7 +13,7 @@
   "type": "commonjs",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && pkg . --targets node18-win-x64 --no-bytecode --output executable/builder.exe",
+    "build": "tsc",
     "build:watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
@@ -38,8 +38,8 @@
     "mongoose": "^8.8.2"
   },
   "devDependencies": {
+    "@types/node": "^22.9.3",
     "pkg": "^5.8.1",
-    "typescript": "^5.7.2",
-    "@types/node": "^22.9.3"
+    "typescript": "^5.7.2"
   }
 }

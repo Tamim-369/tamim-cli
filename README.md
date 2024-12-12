@@ -73,9 +73,9 @@ This will create:
 
 in the user folder
 
-## Configuration
+## Configuration (Optional)
 
-Create a `tamim.config.cjs` file in your project root:
+Create a `tamim.config.cjs` file in your project root if you want to add api requests automatically in your postman collection:
 
 ```javascript
 module.exports = {
