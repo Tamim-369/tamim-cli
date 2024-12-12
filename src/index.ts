@@ -278,11 +278,15 @@ if (
 }
 program
   .command("create <name> <fields...>")
-  .description("Create a new module with specified fields")
+  .description(
+    "Create a new module with specified fields. For example tamim create moduleName field1:string field2:number field5:ref=>Model field6:array=>string field7:array=>ref=>Model"
+  )
   .action(createModule);
 program
   .command("addFile <moduleFiles...>")
-  .description("Add a new file to the module")
+  .description(
+    "Add a new file to the module. For example tamim addFile moduleName:fileType "
+  )
   .action(addFile);
 
 program.parse(process.argv);
