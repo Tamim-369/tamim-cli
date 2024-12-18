@@ -121,7 +121,7 @@ If configured, automatically generates Postman collection with:
 ## Author
 
 **Ashiqur Rahman Tamim**  
-Email: ashiqurrahmantamim369@gmail.com
+Email: ashiqurrahmantamim369@gmail.com\
 Repo: [https://github.com/Tamim-369/tamim-cli](https://github.com/Tamim-369/tamim-cli)
 
 ## License
