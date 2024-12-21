@@ -74,6 +74,9 @@ export const createModule = async (name: string, fields: string[]) => {
         }
       }
     });
+    //update central route file
+    updateRouterFile(name, capitalizedName(name));
+
     const isExistFileField = fileFieldData.length > 0;
     console.log(
       `\nSuccessfully created module '${name}' with all required files.`
@@ -93,9 +96,6 @@ export const createModule = async (name: string, fields: string[]) => {
         fileFieldData as { fieldName: string; fieldType: string }[] | null
       );
     }
-
-    //update central route file
-    updateRouterFile(name, capitalizedName(name));
 
     console.log(
       `\nSuccessfully added requests to postman and created required files`

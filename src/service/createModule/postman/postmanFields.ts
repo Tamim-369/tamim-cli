@@ -29,7 +29,7 @@ export const createPostmanFields = async (parsedFields: any[]) => {
       default:
         if (field.type.includes("array")) {
           const baseType = field.type.split("=>")[1];
-          console.log(baseType);
+          // console.log(baseType);
           if (baseType.includes("ref")) {
             value = [`${generateRandomString()}`];
             break;

@@ -172,10 +172,10 @@ export const automatePostman = async (
       },
     };
 
-    console.log(
-      "Updating collection with payload:",
-      JSON.stringify(updatePayload, null, 2)
-    );
+    // console.log(
+    //   "Updating collection with payload:",
+    //   JSON.stringify(updatePayload, null, 2)
+    // );
 
     const updateResponse = await axios.put(
       `https://api.getpostman.com/collections/${collectionId}`,
