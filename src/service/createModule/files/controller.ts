@@ -1,5 +1,4 @@
-import { FileTypes } from "../enums/fileTypes";
-import { IField } from "../types/field.type";
+import { IField } from "../../../types/field.type";
 
 export const generateControllerTemplate = (
   name: string,

@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 import axios from "axios";
-import { request } from "../types/request.type";
-import { FileTypes } from "../enums/fileTypes";
-import { FileFieldData } from "../types/field.type";
+import { request } from "../../../types/request.type";
+import { FileFieldData } from "../../../types/field.type";
 
 dotenv.config();
 

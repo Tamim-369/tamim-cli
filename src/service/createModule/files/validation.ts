@@ -1,4 +1,4 @@
-import { IField } from "../types/field.type";
+import { IField } from "../../../types/field.type";
 
 export const generateValidationTemplate = (
   name: string,
