@@ -3,7 +3,7 @@ import axios from "axios";
 import path from "path";
 import { request } from "../types/request.type";
 import { fileGenerators } from "../service/createModule/fileGeneratos";
-import { capitalize } from "../helpers/capitalize";
+import { capitalize, capitalizedName } from "../helpers/capitalize";
 import { FileFieldData, IField } from "../types/field.type";
 import { FileTypes } from "../enums/fileTypes";
 import { parseFields } from "../utils/parseFields";
@@ -12,6 +12,7 @@ import { generateFileContent } from "../service/createModule/generateFileContent
 import { createPostmanFields } from "../service/createModule/postman/postmanFields";
 import { createRequestArray } from "../service/createModule/postman/requestArray";
 import { automatePostman } from "../service/createModule/postman/createModulePostman";
+import { updateRouterFile } from "../helpers/updateCentralRouteFile";
 
 export const createModule = async (name: string, fields: string[]) => {
   if (!name) {
@@ -92,6 +93,10 @@ export const createModule = async (name: string, fields: string[]) => {
         fileFieldData as { fieldName: string; fieldType: string }[] | null
       );
     }
+
+    //update central route file
+    updateRouterFile(name, capitalizedName(name));
+
     console.log(
       `\nSuccessfully added requests to postman and created required files`
     );
