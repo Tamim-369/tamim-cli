@@ -40,7 +40,7 @@ export function updateRouterFile(
       // Check if route already exists
       if (!currentRoutes.includes(`path: '/${folderName}'`)) {
         const updatedRoutes = currentRoutes
-          ? `${currentRoutes},\n${routeEntry}`
+          ? `${currentRoutes}\n${routeEntry}`
           : routeEntry;
 
         routerFileContent = routerFileContent.replace(
