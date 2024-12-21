@@ -14,6 +14,7 @@ import { generateModelTemplate } from "./module/model.js";
 import { FileTypes } from "./enums/fileTypes.js";
 import { request } from "./types/request.type.js";
 import addFile from "./addFile.js";
+import { capitalize, capitalizedName } from "./helpers/capitalize.js";
 
 // File generator configuration
 const fileGenerators: any = {
@@ -207,11 +208,8 @@ const createModule = async (name: string, fields: string[]) => {
     }));
 
     files.forEach(({ path, type }) => {
-      const capitalizedModuleName =
-        name.charAt(0).toUpperCase() + name.slice(1);
-      const exportName = `${capitalizedModuleName}${
-        type.charAt(0).toUpperCase() + type.slice(1)
-      }`;
+      const capitalizedModuleName = capitalize(name);
+      const exportName = `${capitalizedModuleName}${capitalize(type)}`;
       const content = generateFileContent(
         type,
         name,

@@ -1,6 +1,7 @@
+import { capitalizedName } from "../helpers/capitalize";
+
 export default function addModelFile(moduleName: string): string {
-  const capitalizedModuleName =
-    moduleName[0].toUpperCase() + moduleName.slice(1);
+  const capitalizedModuleName = capitalizedName(moduleName);
   return `
   import { Schema, model } from 'mongoose';
   import { I${capitalizedModuleName}, ${capitalizedModuleName}Model } from './${moduleName}.interface';

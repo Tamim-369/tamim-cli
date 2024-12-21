@@ -1,6 +1,7 @@
+import { capitalizedName } from "../helpers/capitalize";
+
 export default function addControllerFile(moduleName: string) {
-  const capitalizedModuleName =
-    moduleName[0].toUpperCase() + moduleName.slice(1);
+  const capitalizedModuleName = capitalizedName(moduleName);
   return `
 import { Request, Response } from 'express';
 import catchAsync from '../../../shared/catchAsync';

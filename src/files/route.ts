@@ -1,6 +1,7 @@
+import { capitalizedName } from "../helpers/capitalize";
+
 export default function addRouteFile(moduleName: string) {
-  const capitalizedModuleName =
-    moduleName[0].toUpperCase() + moduleName.slice(1);
+  const capitalizedModuleName = capitalizedName(moduleName);
   return `
   import express from 'express';
 import { ${capitalizedModuleName}Validation } from './${moduleName}.validation';
