@@ -1,4 +1,4 @@
-import { capitalizedName } from "../helpers/capitalize";
+import { capitalizedName } from "../../../helpers/capitalize";
 
 export default function addValidationFile(moduleName: string) {
   const capitalizedModuleName = capitalizedName(moduleName);

@@ -1,5 +1,5 @@
-import { generateRandomString } from "../utils/random";
-import { request } from "../types/request.type";
+import { request } from "../../../types/request.type";
+import { generateRandomString } from "../../../utils/random";
 
 export const createRequestArray = async (
   name: string,

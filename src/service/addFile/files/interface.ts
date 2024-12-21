@@ -1,4 +1,4 @@
-import { capitalizedName } from "../helpers/capitalize";
+import { capitalizedName } from "../../../helpers/capitalize";
 
 export default function addInterfaceFile(moduleName: string) {
   const capitalizedModuleName = capitalizedName(moduleName);

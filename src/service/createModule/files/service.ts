@@ -1,4 +1,4 @@
-import { FileFieldData, IField } from "../types/field.type";
+import { FileFieldData, IField } from "../../../types/field.type";
 
 // templates/service.template.js
 export const generateServiceTemplate = (

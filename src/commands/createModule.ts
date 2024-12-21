@@ -2,16 +2,16 @@ import fs from "fs";
 import axios from "axios";
 import path from "path";
 import { request } from "../types/request.type";
-import { fileGenerators } from "../constants/fileGeneratos";
+import { fileGenerators } from "../service/createModule/fileGeneratos";
 import { capitalize } from "../helpers/capitalize";
-import { generateFileContent } from "../services/generateFileContent";
 import { FileFieldData, IField } from "../types/field.type";
 import { FileTypes } from "../enums/fileTypes";
-import { automatePostman } from "../postman/createModulePostman";
-import { createPostmanFields } from "../postman/postmanFields";
 import { parseFields } from "../utils/parseFields";
 import { generateRandomString } from "../utils/random";
-import { createRequestArray } from "../postman/requestArray";
+import { generateFileContent } from "../service/createModule/generateFileContent";
+import { createPostmanFields } from "../service/createModule/postman/postmanFields";
+import { createRequestArray } from "../service/createModule/postman/requestArray";
+import { automatePostman } from "../service/createModule/postman/createModulePostman";
 
 export const createModule = async (name: string, fields: string[]) => {
   if (!name) {

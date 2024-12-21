@@ -1,13 +1,13 @@
-import addControllerFile from "../files/controller";
 import fs from "fs";
 import path from "path";
-import addRouteFile from "../files/route";
-import addValidationFile from "../files/validation";
-import addServiceFile from "../files/service";
-import addInterfaceFile from "../files/interface";
-import addModelFile from "../files/model";
-import addConstantFile from "../files/constants";
-import addUtilsFile from "../files/utils";
+import addControllerFile from "../service/addFile/files/controller";
+import addRouteFile from "../service/addFile/files/route";
+import addValidationFile from "../service/addFile/files/validation";
+import addServiceFile from "../service/addFile/files/service";
+import addInterfaceFile from "../service/addFile/files/interface";
+import addModelFile from "../service/addFile/files/model";
+import addUtilsFile from "../service/addFile/files/utils";
+import addConstantFile from "../service/addFile/files/constants";
 
 export default function addFile(moduleFiles: string): void {
   for (const file of moduleFiles) {

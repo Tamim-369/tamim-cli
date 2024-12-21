@@ -1,6 +1,6 @@
-import { fileGenerators } from "../constants/fileGeneratos";
-import { FileTypes } from "../enums/fileTypes";
-import { FileFieldData, IField } from "../types/field.type";
+import { fileGenerators } from "./fileGeneratos";
+import { FileTypes } from "../../enums/fileTypes";
+import { FileFieldData, IField } from "../../types/field.type";
 
 export const generateFileContent = (
   fileType: string,

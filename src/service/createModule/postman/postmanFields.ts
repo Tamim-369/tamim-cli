@@ -1,4 +1,4 @@
-import { generateRandomString } from "../utils/random";
+import { generateRandomString } from "../../../utils/random";
 
 export const createPostmanFields = async (parsedFields: any[]) => {
   return await parsedFields.reduce((acc: any, field: any) => {
