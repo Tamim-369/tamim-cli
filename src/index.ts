@@ -19,9 +19,9 @@ program
   )
   .action(createModule);
 program
-  .command("addFile <moduleFiles...>")
+  .command("add <moduleFiles...>")
   .description(
-    "Add a new file to the module. For example tamim addFile moduleName:fileType "
+    "Add a new file to the module. For example tamim add moduleName:fileType "
   )
   .action(addFile);
 

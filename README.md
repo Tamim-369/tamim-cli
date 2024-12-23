@@ -60,11 +60,11 @@ This will create:
 ### Add Files to Existing Module
 
 ```bash
-tamim addFile <moduleFiles...>
+tamim add <moduleFiles...>
 ```
 
 ```bash
-tamim addFile user:route
+tamim add user:route
 ```
 
 This will create:
@@ -74,7 +74,7 @@ This will create:
 in the user folder
 
 ```bash
-tamim addFile user/auth:route
+tamim add user/auth:route
 ```
 
 This will create:
