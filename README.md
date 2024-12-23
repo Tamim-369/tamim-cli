@@ -73,6 +73,16 @@ This will create:
 
 in the user folder
 
+```bash
+tamim addFile user/auth:route
+```
+
+This will create:
+
+- auth.route.ts
+
+in the auth folder in the user folder
+
 ## Configuration (Optional)
 
 Create a `tamim.config.cjs` file in your project root if you want to add api requests automatically in your postman collection:
