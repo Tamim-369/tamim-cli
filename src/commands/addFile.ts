@@ -11,8 +11,11 @@ import addConstantFile from "../service/addFile/files/constants";
 
 export default function addFile(moduleFiles: string): void {
   for (const file of moduleFiles) {
-    const [moduleName, fileType] = file.split(":");
-
+    const [modulePath, fileType] = file.split(":");
+    const moduleArray = modulePath.includes("/")
+      ? modulePath.split("/")
+      : [modulePath];
+    const moduleName = moduleArray[moduleArray.length - 1];
     let content = "";
     switch (fileType) {
       case "controller":
@@ -51,7 +54,7 @@ export default function addFile(moduleFiles: string): void {
         "src",
         "app",
         "modules",
-        moduleName
+        ...moduleArray
       );
       fs.mkdirSync(moduleDir, { recursive: true });
 
