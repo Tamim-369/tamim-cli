@@ -44,10 +44,9 @@ export const createModule = async (
       path: `${moduleDir}/${name}.${type}`,
       type: type.split(".")[0],
     }));
-    const removeTypes = options.remove || [];
-    const addTypes = options.add || [];
+    const skipTypes = options.skip || [];
     files.forEach(({ path, type }) => {
-      if (removeTypes.includes(type) || addTypes.includes(type)) {
+      if (skipTypes.includes(type)) {
         console.log(`Skipped: ${type}`);
         return;
       }
