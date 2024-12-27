@@ -57,6 +57,30 @@ This will create:
 - user.interface.ts
 - user.model.ts
 
+Supported file types:
+
+- `route`
+- `controller`
+- `service`
+- `validation`
+- `interface`
+- `model`
+
+If you add --remove or -r and give the file types you want to skip then it will not create that file
+
+Example:
+
+```bash
+tamim create user name:string email:string age:number profileImage:string isActive:boolean --remove route validation
+```
+
+This will skip route and validation and just create:
+
+- user.controller.ts
+- user.service.ts
+- user.interface.ts
+- user.model.ts
+
 ### Add Files to Existing Module
 
 ```bash

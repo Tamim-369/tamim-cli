@@ -44,8 +44,13 @@ export const createModule = async (
       path: `${moduleDir}/${name}.${type}`,
       type: type.split(".")[0],
     }));
-
+    const removeTypes = options.remove || [];
+    const addTypes = options.add || [];
     files.forEach(({ path, type }) => {
+      if (removeTypes.includes(type) || addTypes.includes(type)) {
+        console.log(`Skipped: ${type}`);
+        return;
+      }
       const capitalizedModuleName = capitalize(name);
       const exportName = `${capitalizedModuleName}${capitalize(type)}`;
       const content = generateFileContent(
