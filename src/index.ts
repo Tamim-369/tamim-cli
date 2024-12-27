@@ -17,7 +17,11 @@ program
   .description(
     "Create a new module with specified fields. For example tamim create moduleName field1:string field2:number field5:ref=>Model field6:array=>string field7:array=>ref=>Model"
   )
-  .action(createModule);
+  .option("-r, --remove <files...>", "Remove file from Module")
+  .option("-a, --add <files...>", "Add functionality in Module")
+  .action((name, fields, options) => {
+    createModule(name, fields, options);
+  });
 program
   .command("add <moduleFiles...>")
   .description(

@@ -14,7 +14,11 @@ import { createRequestArray } from "../service/createModule/postman/requestArray
 import { automatePostman } from "../service/createModule/postman/createModulePostman";
 import { updateRouterFile } from "../helpers/updateCentralRouteFile";
 
-export const createModule = async (name: string, fields: string[]) => {
+export const createModule = async (
+  name: string,
+  fields: string[],
+  options: any
+) => {
   if (!name) {
     console.error("Error: Module name is required");
     process.exit(1);
@@ -49,7 +53,8 @@ export const createModule = async (name: string, fields: string[]) => {
         name,
         capitalizedModuleName,
         exportName,
-        parsedFields
+        parsedFields,
+        options
       );
       fs.writeFileSync(path, content.trim() + "\n");
       console.log(`Created: ${path}`);

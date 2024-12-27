@@ -7,7 +7,8 @@ export const generateFileContent = (
   name: string,
   capitalizedModuleName: string,
   exportName: string,
-  fields: IField[]
+  fields: IField[],
+  options: Object
 ) => {
   const generator = fileGenerators[`${fileType}.ts`];
   if (!generator) {
