@@ -31,13 +31,14 @@ export const generateValidationTemplate = (
         return `${field.name}: z.${
           field.type.includes("ref") ? "string" : field.type
         }({ ${
-          field.isRequired &&
-          `required_error:"${
-            field.name === "Date" ? "date" : field.name
-          } is required",`
+          field.isRequired
+            ? `required_error:"${
+                field.name === "Date" ? "date" : field.name
+              } is required",`
+            : ""
         } invalid_type_error:"${field.name} should be type ${
           field.type.includes("ref") ? "objectID or string" : field.type
-        }" })`;
+        }" })${field.isRequired === false ? `.optional()` : ""}`;
       })
       .join(",\n      ");
   };
