@@ -66,12 +66,12 @@ Supported file types:
 - `interface`
 - `model`
 
-If you add --remove or -r and give the file types you want to skip then it will not create that file
+If you add --skip or -s and give the file types you want to skip then it will not create that file
 
 Example:
 
 ```bash
-tamim create user name:string email:string age:number profileImage:string isActive:boolean --remove route validation
+tamim create user name:string email:string age:number profileImage:string isActive:boolean --skip route validation
 ```
 
 This will skip route and validation and just create:
