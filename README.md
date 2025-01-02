@@ -21,6 +21,72 @@ npm install -g tamim-cli
 
 ## Usage
 
+### Create a New Project
+
+```bash
+tamim create-new-app
+```
+
+It will ask about the name of the app and the package manager you want to use once you answer those it will create a folder structure like this
+
+```
+├── node_modules
+├── src
+│   ├── app
+│   │   ├── middlewares
+│   │   │   ├── auth.ts
+│   │   │   ├── fileUploadHandler.ts
+│   │   │   ├── globalErrorHandler.ts
+│   │   │   └── validateRequest.ts
+│   │   └── modules
+│   │       ├── auth
+│   │       ├── resetToken
+│   │       └── user
+│   ├── app.ts
+│   ├── config
+│   │   └── index.ts
+│   ├── enums
+│   │   └── user.ts
+│   ├── errors
+│   │   ├── ApiError.ts
+│   │   ├── handleValidationError.ts
+│   │   └── handleZodError.ts
+│   ├── helpers
+│   │   ├── emailHelper.ts
+│   │   ├── jwtHelper.ts
+│   │   ├── paginationHelper.ts
+│   │   └── socketHelper.ts
+│   ├── routes
+│   │   └── index.ts
+│   ├── seed
+│   │   └── seedAdmin.ts
+│   ├── server.ts
+│   ├── shared
+│   │   ├── catchAsync.ts
+│   │   ├── constrant.ts
+│   │   ├── emailTemplate.ts
+│   │   ├── logger.ts
+│   │   ├── morgen.ts
+│   │   ├── pick.ts
+│   │   ├── sendResponse.ts
+│   │   └── unlinkFile.ts
+│   ├── types
+│   │   ├── auth.ts
+│   │   ├── emailTamplate.ts
+│   │   ├── email.ts
+│   │   ├── errors.types.ts
+│   │   ├── index.d.ts
+│   │   └── pagination.ts
+│   └── util
+│       ├── cryptoToken.ts
+│       └── generateOTP.ts
+├── tsconfig.json
+├── package.json
+├── README.md
+└── yarn.lock
+
+```
+
 ### Create a New Module
 
 ```bash
