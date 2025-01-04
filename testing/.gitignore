@@ -1,0 +1,5 @@
+node_modules
+.env
+dist
+/winston
+sparkpress.config.js
