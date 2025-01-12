@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
 import { spawnSync } from "child_process";
-import { existsSync, rmSync } from "fs";
+import { existsSync, rmSync, rmdirSync } from "fs";
 import { join } from "path";
 
 export default async function newApp(): Promise<void> {
@@ -43,15 +43,15 @@ export default async function newApp(): Promise<void> {
       );
 
       if (relevantFiles.length > 0) {
+        console.error("\n❌ Error: The current directory is not empty");
         console.error(
-          `The current directory is not empty. Please use an empty directory or specify a new directory name.`
+          "   Please use an empty directory or specify a new directory name\n"
         );
         return;
       }
     } else {
-      console.error(
-        `The directory '${name}' already exists. Please choose another name.`
-      );
+      console.error(`\n❌ Error: The directory '${name}' already exists`);
+      console.error("   Please choose another name\n");
       return;
     }
   }
@@ -59,17 +59,47 @@ export default async function newApp(): Promise<void> {
   const gitUrl = "https://github.com/Tamim-369/tamim-template.git";
 
   try {
-    // Clone directly using the provided name, even for current directory
+    console.log("\n🚀 Initializing new project...");
+
+    // Clone directly using the provided name
+    console.log(`\n📦 Downloading template...`);
     spawnSync("git", ["clone", gitUrl, name], {
-      stdio: "inherit",
+      stdio: "pipe", // Change to pipe to suppress git output
       cwd: process.cwd(),
     });
 
     console.log(
-      `Repository cloned successfully${
-        isCurrentDir ? " into current directory" : ` into ${name}`
-      }.`
+      `✅ Template downloaded successfully${
+        isCurrentDir ? " to current directory" : ` to ./${name}`
+      }`
     );
+
+    // Remove .git folder with proper error handling
+    const gitFolder = join(destination, ".git");
+    if (existsSync(gitFolder)) {
+      try {
+        console.log("\n🔧 Preparing project structure...");
+        // First attempt: Use rmSync with recursive option
+        rmSync(gitFolder, { recursive: true, force: true });
+      } catch (error) {
+        try {
+          // Second attempt: Use git command to clean up (works better on Windows)
+          spawnSync("git", ["clean", "-fxd"], {
+            stdio: "pipe",
+            cwd: destination,
+          });
+          // Remove .git directory using git command
+          spawnSync("git", ["checkout-index", "-a", "-f", "--prefix=./"], {
+            stdio: "pipe",
+            cwd: destination,
+          });
+          rmSync(gitFolder, { recursive: true, force: true });
+        } catch (innerError) {
+          console.warn("\n⚠️  Warning: Git folder cleanup incomplete");
+          console.warn("   You may need to remove the .git folder manually\n");
+        }
+      }
+    }
 
     const packageManager = answers.packageManager;
 
@@ -82,6 +112,7 @@ export default async function newApp(): Promise<void> {
     };
 
     // Remove unnecessary lock files
+    console.log(`\n📝 Configuring ${packageManager}...`);
     lockFiles[packageManager].forEach((file) => {
       rmSync(join(destination, file), { force: true });
     });
@@ -94,22 +125,40 @@ export default async function newApp(): Promise<void> {
       bun: "bun install",
     };
 
+    console.log("\n📥 Installing dependencies...");
     spawnSync(installCommands[packageManager], {
-      stdio: "inherit",
+      stdio: "pipe",
       cwd: destination,
       shell: true,
     });
-  } catch (error) {
-    console.error(
-      `Failed to ${
-        isCurrentDir
-          ? "setup current directory"
-          : `clone repository into ${name}`
-      }:`,
-      error
+
+    console.log("\n✨ Success! Your new project is ready.");
+    console.log(
+      `\n📁 Project location: ${
+        isCurrentDir ? "current directory" : `./${name}`
+      }`
     );
+    console.log("\n🎉 You can now start developing your application:");
+    if (!isCurrentDir) {
+      console.log(`   cd ${name}`);
+    }
+    console.log(
+      `   ${packageManager}${packageManager === "npm" ? " run" : ""} dev\n`
+    );
+  } catch (error) {
+    console.error("\n❌ Error: Failed to initialize project");
+    console.error(
+      `   ${
+        isCurrentDir
+          ? "Could not setup current directory"
+          : `Could not create ${name}`
+      }`
+    );
+    console.error(`   ${error}\n`);
+
     // Clean up the destination directory if it was created
     if (!isCurrentDir && existsSync(destination)) {
+      console.log("🧹 Cleaning up...");
       rmSync(destination, { recursive: true, force: true });
     }
   }
