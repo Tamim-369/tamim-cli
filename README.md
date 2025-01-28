@@ -147,6 +147,8 @@ This will skip route and validation and just create:
 - user.interface.ts
 - user.model.ts
 
+And there is also a twist if you use `--skip filter` or `-s filter` it will skip the filter and pagination part in the getall function
+
 ### Add Files to Existing Module
 
 ```bash

@@ -1,10 +1,12 @@
 import { IField } from "../../../types/field.type";
+import { IOptions } from "../../../types/options.type";
 
 export const generateRouteTemplate = (
   name: string,
   capitalizedModuleName: string,
   fields: IField[],
-  isExistFileField: boolean
+  isExistFileField: boolean,
+  options: IOptions
 ) => {
   return `
 import express from 'express';

@@ -1,12 +1,15 @@
 import { IField } from "../../../types/field.type";
+import { IOptions } from "../../../types/options.type";
 
 export const generateControllerTemplate = (
   name: string,
   capitalizedModuleName: string,
   fields: IField[],
   isExistFileField: boolean,
-  fileFieldData: { fieldName: string; fieldType: string }[] | null
+  fileFieldData: { fieldName: string; fieldType: string }[] | null,
+  options: IOptions
 ) => {
+  const skipFilter = options?.skip?.includes("filter");
   const fileHandlingLogic =
     isExistFileField && fileFieldData && fileFieldData.length > 0
       ? fileFieldData
@@ -44,10 +47,23 @@ export const generateControllerTemplate = (
     });
 
     const getAll${capitalizedModuleName}s = catchAsync(async (req: Request, res: Response) => {
-      const query = req.query;
-
-      const result = await ${capitalizedModuleName}Service.getAll${capitalizedModuleName}s(query);
+    ${skipFilter ? "" : `const query = req.query;`}
+      const result = await ${capitalizedModuleName}Service.getAll${capitalizedModuleName}s(${
+    skipFilter ? "" : "query"
+  });
       sendResponse(res, {
+        ${
+          skipFilter
+            ? ""
+            : `
+        pagination: {
+          limit: Number(query.limit) || 10,
+          page: Number(query.page) || 1,
+          total: result.length,
+          totalPage: Math.ceil(result.length / (Number(query.limit) || 10)),
+        },
+        `
+        }
         statusCode: StatusCodes.OK,
         success: true,
         message: '${capitalizedModuleName}s fetched successfully',

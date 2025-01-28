@@ -1,6 +1,7 @@
 import { fileGenerators } from "./fileGeneratos";
 import { FileTypes } from "../../enums/fileTypes";
 import { FileFieldData, IField } from "../../types/field.type";
+import { IOptions } from "../../types/options.type";
 
 export const generateFileContent = (
   fileType: string,
@@ -8,7 +9,7 @@ export const generateFileContent = (
   capitalizedModuleName: string,
   exportName: string,
   fields: IField[],
-  options: Object
+  options: IOptions
 ) => {
   const generator = fileGenerators[`${fileType}.ts`];
   if (!generator) {
@@ -40,6 +41,7 @@ export const generateFileContent = (
     capitalizedModuleName,
     fields,
     isExistFileField,
-    fileFieldData || null
+    fileFieldData || null,
+    options
   );
 };

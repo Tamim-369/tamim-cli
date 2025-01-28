@@ -13,17 +13,17 @@ import { createPostmanFields } from "../service/createModule/postman/postmanFiel
 import { createRequestArray } from "../service/createModule/postman/requestArray";
 import { automatePostman } from "../service/createModule/postman/createModulePostman";
 import { updateRouterFile } from "../helpers/updateCentralRouteFile";
+import { IOptions } from "../types/options.type";
 
 export const createModule = async (
   name: string,
   fields: string[],
-  options: any
+  options: IOptions
 ) => {
   if (!name) {
     console.error("Error: Module name is required");
     process.exit(1);
   }
-
   if (!Array.isArray(fields) || fields.length === 0) {
     console.error("Error: At least one field must be specified");
     process.exit(1);

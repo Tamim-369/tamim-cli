@@ -1,4 +1,6 @@
 import { FileFieldData, IField } from "../../../types/field.type";
+import { IOptions } from "../../../types/options.type";
+import { serviceLogicHelper } from "../logicHelpers/serviceLogicHelper";
 
 // templates/service.template.js
 export const generateServiceTemplate = (
@@ -6,7 +8,8 @@ export const generateServiceTemplate = (
   capitalizedModuleName: string,
   fields: IField[],
   isExistFileField: boolean,
-  fileFieldData: FileFieldData[] | null
+  fileFieldData: FileFieldData[] | null,
+  options: IOptions
 ) => {
   const generateSearchFields = (fields: IField[]) => {
     return fields
@@ -19,6 +22,7 @@ export const generateServiceTemplate = (
       .filter(Boolean)
       .join(",\n        ");
   };
+  const skipFilter = options?.skip?.includes("filter");
 
   return `
   import { StatusCodes } from 'http-status-codes';
@@ -45,20 +49,15 @@ export const generateServiceTemplate = (
     return result;
   };
   
-  const getAll${capitalizedModuleName}s = async (queryFields: Record<string, any>): Promise<I${capitalizedModuleName}[]> => {
-  const { search, page, limit } = queryFields;
-    const query = search ? { $or: [${generateSearchFields(fields)}] } : {};
-    let queryBuilder = ${capitalizedModuleName}.find(query);
-  
-    if (page && limit) {
-      queryBuilder = queryBuilder.skip((page - 1) * limit).limit(limit);
-    }
-    delete queryFields.search;
-    delete queryFields.page;
-    delete queryFields.limit;
-    queryBuilder.find(queryFields);
-    return await queryBuilder;
-  };
+ ${
+   skipFilter
+     ? serviceLogicHelper.filterNotIncluded(capitalizedModuleName)
+     : serviceLogicHelper.filterIncluded(
+         capitalizedModuleName,
+         generateSearchFields,
+         fields
+       )
+ }
   
   
   const get${capitalizedModuleName}ById = async (id: string): Promise<I${capitalizedModuleName} | null> => {
