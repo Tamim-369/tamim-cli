@@ -13,7 +13,9 @@ import express from 'express';
 import { ${capitalizedModuleName}Controller } from './${name}.controller';
 import { USER_ROLES } from '../../../enums/user';
 import auth from '../../middlewares/auth';
-import validateRequest from '../../middlewares/validateRequest';
+import validateRequest${
+    isExistFileField ? "ZFD" : ""
+  } from '../../middlewares/validateRequest';
 import { ${capitalizedModuleName}Validation } from './${name}.validation';
 ${
   isExistFileField
@@ -27,7 +29,9 @@ router.post(
   auth(...rolesOfAccess),
   ${
     isExistFileField
-      ? "fileUploadHandler(),"
+      ? `fileUploadHandler(),
+      validateRequestZFD(${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema),
+      `
       : `validateRequest(${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema),`
   }
   ${capitalizedModuleName}Controller.create${capitalizedModuleName}
@@ -39,7 +43,9 @@ router.patch(
   auth(...rolesOfAccess),
   ${
     isExistFileField
-      ? "fileUploadHandler(),"
+      ? `fileUploadHandler(),
+    validateRequestZFD(${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema),
+    `
       : `validateRequest(${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema),`
   }
   ${capitalizedModuleName}Controller.update${capitalizedModuleName}
