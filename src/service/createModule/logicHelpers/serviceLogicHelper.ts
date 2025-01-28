@@ -10,6 +10,9 @@ const filterIncluded = (
   
     if (page && limit) {
       queryBuilder = queryBuilder.skip((page - 1) * limit).limit(limit);
+    }else{
+      queryBuilder = queryBuilder.skip(0).limit(10);
+    
     }
     delete queryFields.search;
     delete queryFields.page;
