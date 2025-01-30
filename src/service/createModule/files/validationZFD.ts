@@ -15,7 +15,7 @@ const generateCreateFieldSchema = (
   }
 
   if (fileFieldData.some((fileField) => fileField.fieldName === name)) {
-    return `${name}: zfd.file()${!isRequired ? ".optional()" : ""}`;
+    return `${name}: zfd.file()${".optional()"}`;
   }
 
   // Handle array of primitive types (e.g., array=>string)
