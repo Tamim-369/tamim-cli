@@ -14,12 +14,7 @@ const generateCreateFieldSchema = (
     }`;
   }
 
-  if (
-    fileFieldData.includes({
-      fieldName: name,
-      fieldType: type,
-    } as FileFieldData)
-  ) {
+  if (fileFieldData.some((fileField) => fileField.fieldName === name)) {
     return `${name}: zfd.file()${!isRequired ? ".optional()" : ""}`;
   }
 
@@ -58,14 +53,19 @@ const generateCreateFieldSchema = (
 };
 
 // Helper function to generate Zod schema for a single field in update validation
-const generateUpdateFieldSchema = (field: IField): string => {
+const generateUpdateFieldSchema = (
+  field: IField,
+  fileFieldData: FileFieldData[]
+): string => {
   const { name, type } = field;
 
   // Handle array of references (e.g., array=>ref=>User)
   if (type.includes("array=>ref=>")) {
     return `${name}: zfd.repeatable(z.array(zfd.text())).optional()`;
   }
-
+  if (fileFieldData.some((fileField) => fileField.fieldName === name)) {
+    return `${name}: zfd.file().optional()`;
+  }
   // Handle array of primitive types (e.g., array=>string)
   if (type.includes("array")) {
     const arrayType = type.includes("array=>ref=>")
@@ -115,7 +115,9 @@ const generateUpdateValidationFields = (
   fields: IField[],
   fileFieldData: FileFieldData[]
 ): string => {
-  return fields.map(generateUpdateFieldSchema).join(",\n      ");
+  return fields
+    .map((field) => generateUpdateFieldSchema(field, fileFieldData))
+    .join(",\n      ");
 };
 
 // Main function to generate the validation template
