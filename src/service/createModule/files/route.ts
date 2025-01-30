@@ -15,7 +15,7 @@ import { USER_ROLES } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import validateRequest${
     isExistFileField ? "ZFD" : ""
-  } from '../../middlewares/validateRequest';
+  } from '../../middlewares/validateRequestZFD';
 import { ${capitalizedModuleName}Validation } from './${name}.validation';
 ${
   isExistFileField
