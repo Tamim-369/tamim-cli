@@ -31,17 +31,13 @@ export const generateServiceTemplate = (
   import { I${capitalizedModuleName} } from './${name}.interface';
   ${
     isExistFileField
-      ? `import { ${capitalizedModuleName}Validation } from './${name}.validation';
+      ? `
     import unlinkFile from '../../../shared/unlinkFile';
     `
       : ""
   }
   const create${capitalizedModuleName} = async (payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName}> => {
-    ${
-      isExistFileField
-        ? `await ${capitalizedModuleName}Validation.create${capitalizedModuleName}ZodSchema.parseAsync(payload);`
-        : ""
-    }
+  
     const result = await ${capitalizedModuleName}.create(payload);
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create ${name}!');
@@ -69,11 +65,7 @@ export const generateServiceTemplate = (
   };
   
   const update${capitalizedModuleName} = async (id: string, payload: I${capitalizedModuleName}): Promise<I${capitalizedModuleName} | null> => {
-      ${
-        isExistFileField
-          ? `await ${capitalizedModuleName}Validation.update${capitalizedModuleName}ZodSchema.parseAsync(payload);`
-          : ""
-      }
+   
     const isExist${capitalizedModuleName} = await get${capitalizedModuleName}ById(id);
     if (!isExist${capitalizedModuleName}) {
       throw new ApiError(StatusCodes.BAD_REQUEST, '${capitalizedModuleName} not found!');
