@@ -7,7 +7,7 @@ export const generateValidationTemplate = (
   capitalizedModuleName: string,
   fields: IField[],
   isExistFileField: boolean,
-  fileFieldData: FileFieldData[] | null
+  fileFieldData: FileFieldData[]
 ) => {
   if (isExistFileField) {
     return generateValidationTemplateZFD(

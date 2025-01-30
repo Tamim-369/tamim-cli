@@ -9,10 +9,9 @@ const generateCreateFieldSchema = (
 
   // Handle array of references (e.g., array=>ref=>User)
   if (type.includes("array=>ref=>")) {
-    return `${name}: zfd.repeatable(z.array(zfd.text({
-      ${isRequired ? `required_error: "${name} is required",` : ""}
-      invalid_type_error: "${name} array item should be type string"
-    })))${!isRequired ? ".optional()" : ""}`;
+    return `${name}: zfd.repeatable(z.array(zfd.text()))${
+      !isRequired ? ".optional()" : ""
+    }`;
   }
 
   if (
@@ -21,10 +20,7 @@ const generateCreateFieldSchema = (
       fieldType: type,
     } as FileFieldData)
   ) {
-    return `${name}: zfd.file({
-      ${isRequired ? `required_error: "${name} is required",` : ""}
-      invalid_type_error: "${name} should be type file"
-    })${!isRequired ? ".optional()" : ""}`;
+    return `${name}: zfd.file()${!isRequired ? ".optional()" : ""}`;
   }
 
   // Handle array of primitive types (e.g., array=>string)
@@ -41,10 +37,9 @@ const generateCreateFieldSchema = (
       default:
         zodType = "zfd.text";
     }
-    return `${name}: zfd.repeatable(z.array(${zodType}({
-      ${isRequired ? `required_error: "${name} is required",` : ""}
-      invalid_type_error: "${name} array item should be type ${arrayType}"
-    })))${!isRequired ? ".optional()" : ""}`;
+    return `${name}: zfd.repeatable(z.array(${zodType}()))${
+      !isRequired ? ".optional()" : ""
+    }`;
   }
 
   // Handle single field (primitive or reference)
@@ -59,16 +54,7 @@ const generateCreateFieldSchema = (
     default:
       zodType = "zfd.text";
   }
-  return `${name}: ${zodType}({
-    ${
-      isRequired
-        ? `required_error: "${name === "Date" ? "date" : name} is required",`
-        : ""
-    }
-    invalid_type_error: "${name} should be type ${
-    type.includes("ref") ? "objectID or string" : type
-  }"
-  })${!isRequired ? ".optional()" : ""}`;
+  return `${name}: ${zodType}()${!isRequired ? ".optional()" : ""}`;
 };
 
 // Helper function to generate Zod schema for a single field in update validation
@@ -77,9 +63,7 @@ const generateUpdateFieldSchema = (field: IField): string => {
 
   // Handle array of references (e.g., array=>ref=>User)
   if (type.includes("array=>ref=>")) {
-    return `${name}: zfd.repeatable(z.array(zfd.text({
-      invalid_type_error: "${name} array item should be type string"
-    }))).optional()`;
+    return `${name}: zfd.repeatable(z.array(zfd.text())).optional()`;
   }
 
   // Handle array of primitive types (e.g., array=>string)
@@ -98,9 +82,7 @@ const generateUpdateFieldSchema = (field: IField): string => {
       default:
         zodType = "zfd.text";
     }
-    return `${name}: zfd.repeatable(z.array(${zodType}({
-      invalid_type_error: "${name} array item should be type ${arrayType}"
-    }))).optional()`;
+    return `${name}: zfd.repeatable(z.array(${zodType}())).optional()`;
   }
 
   // Handle single field (primitive or reference)
@@ -115,11 +97,7 @@ const generateUpdateFieldSchema = (field: IField): string => {
     default:
       zodType = "zfd.text";
   }
-  return `${name}: ${zodType}({
-    invalid_type_error: "${name} should be type ${
-    type.includes("ref=>") ? "objectID or string" : type
-  }"
-  }).optional()`;
+  return `${name}: ${zodType}().optional()`;
 };
 
 // Generate validation fields for create schema
@@ -127,7 +105,9 @@ const generateCreateValidationFields = (
   fields: IField[],
   fileFieldData: FileFieldData[]
 ): string => {
-  return fields.map(generateCreateFieldSchema).join(",\n      ");
+  return fields
+    .map((field) => generateCreateFieldSchema(field, fileFieldData))
+    .join(",\n      ");
 };
 
 // Generate validation fields for update schema
